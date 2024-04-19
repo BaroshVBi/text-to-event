@@ -1,0 +1,60 @@
+<html>
+	<head>
+	</head>
+	<body>
+		<div>
+			<textarea id="textToParse" wrap="off"></textarea>
+			<button onClick="generate()">Generuj</button>
+		</div>
+		<div id="test">
+		
+		</div>
+		<script>
+			var d = 0;
+			var array2d = [];
+			var arrayTemp;
+			var test = document.getElementById("test");
+			
+			function generate() {
+				var text = document.getElementById("textToParse").value;
+				var array = text.split("\n");
+				var newText = "";
+				
+				for(i = 0; i < (array.length / 4); i++) {
+					var id = i * 4;
+					array2d.push([array[id], array[id + 1], array[id + 2]]);
+					//console.log(array[i]);
+					//newText = newText + array[i] + "<br>";
+				}
+				table = "<table>";
+				for(i = 0; i < array2d.length; i++) {
+					var calendarID = array2d[i][0].slice(0, array2d[i][0].indexOf("."));
+					
+					var calendarTITLE = array2d[i][2];
+					var calendarTEXT = calendarID + ".+" + array2d[i][2].replace(" ", "+");
+					console.log(calendarTEXT);
+					
+					var calendarDETAILS = array2d[i][0].replace(/ /g, "+");
+					//console.log(calendarDETAILS);
+					
+					var calendarDATES = array2d[i][1].slice(0,19);
+					calendarDATES = calendarDATES.replace(" ", "T");
+					calendarDATES = calendarDATES.replace(/:/g, "");
+					calendarDATES = calendarDATES.replace(/-/g, "");
+					console.log(calendarDATES);
+					
+					var calendarLINK = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + calendarTEXT + "&details=plemiona&dates=" + calendarDATES + "/" + calendarDATES;
+					
+					table = table + "<tr><td>" + calendarID + "</td><td id=" + calendarID + " ><a onClick='color(" + calendarID +")' target='_blank' href = " + calendarLINK + ">DODAJ</a></td></tr>"; 
+				}
+				table = table + "</table>";
+				test.innerHTML = table;
+				//test.innerHTML = array2d[27][1];
+			}
+			
+			function color(id) {
+				document.getElementById(id).style.backgroundColor = "red";
+			}
+		</script>
+	</body>
+</html>
