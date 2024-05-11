@@ -14,7 +14,9 @@ Wyślij burzak
 3. Wyślij fejk z wioski 003 - IOP (374|670) K63  na Wioska barbarzyńska (516|659) K65 
 2024-04-19 09:47:14 - 09:47:29
 Wyślij fejk"></textarea>
-			<button onClick="generate()">Generuj</button>
+			<textarea id="textToTable" wrap="off" style="width: 826px; height: 281px;" placeholder=""></textarea>
+			<button onClick="generate()">Generuj linki</button>
+			<button onClick="genTable()">Generuj tabele</button>
 		</div>
 		<div id="test">
 		
@@ -27,19 +29,19 @@ Wyślij fejk"></textarea>
 			var array2d = [];
 			var arrayTemp;
 			var test = document.getElementById("test");
+			var testTable = document.getElementById("textToTable");
 			
 			function generate() {
 				var text = document.getElementById("textToParse").value;
 				var array = text.split("\n");
-				var newText = "";
+				var table = "<table>";
 				
 				for(i = 0; i < (array.length / 4); i++) {
 					var id = i * 4;
 					array2d.push([array[id], array[id + 1], array[id + 2]]);
 					//console.log(array[i]);
-					//newText = newText + array[i] + "<br>";
 				}
-				table = "<table>";
+
 				for(i = 0; i < array2d.length; i++) {
 					var calendarID = array2d[i][0].slice(0, array2d[i][0].indexOf("."));
 					
@@ -63,6 +65,25 @@ Wyślij fejk"></textarea>
 				table = table + "</table>";
 				test.innerHTML = table;
 				//test.innerHTML = array2d[27][1];
+			}
+			
+			function genTable() {
+				var text = document.getElementById("textToParse").value;
+				var array = text.split("\n");
+				var table = "[table]\n[**]head1[||]head2[||]head3[/**]\n";
+				
+				for(i = 0; i < (array.length / 4); i++) {
+					var id = i * 4;
+					array2d.push([array[id], array[id + 1], array[id + 2]]);
+					console.log(array[i]);
+				}
+				
+				for(i = 0; i < array2d.length; i++) {
+					table = table + "[*]" + array2d[i][0] + "[|]" + array2d[i][1] + "[|]" + array2d[i][2] + "[/*]\n";
+				}
+				
+				table = table + "[/table]"
+				testTable.innerHTML = table;
 			}
 			
 			function color(id) {
