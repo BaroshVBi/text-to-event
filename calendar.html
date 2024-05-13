@@ -3,20 +3,12 @@
 	</head>
 	<body>
 		<div>
-			<textarea id="textToParse" wrap="off" style="width: 826px; height: 281px;" placeholder="1. Burzak (Katapulty-50 Zagroda) z wioski 002 - Las Vegas (375|674) K63  na Wioska barbarzyńska (518|690) K65 
-2024-04-19 09:18:14 - 10:03:14
-Wyślij burzak
-
-2. Burzak (Katapulty-50 Zagroda) z wioski 008 (372|671) K63  na O Cie Florian (514|692) K65 
-2024-04-19 09:28:40 - 10:13:40
-Wyślij burzak
-
-3. Wyślij fejk z wioski 003 - IOP (374|670) K63  na Wioska barbarzyńska (516|659) K65 
-2024-04-19 09:47:14 - 09:47:29
-Wyślij fejk"></textarea>
-			<textarea id="textToTable" wrap="off" style="width: 826px; height: 281px;" placeholder=""></textarea>
-			<button onClick="generate()">Generuj linki</button>
-			<button onClick="genTable()">Generuj tabele</button>
+			<textarea id="textToParse" wrap="off" style="width: 826px; height: 281px;" placeholder=""></textarea>
+			<textarea id="textToTable" wrap="off" style="width: 826px; height: 281px;" placeholder=""></textarea><br>
+			<input type="number" id="configMIN" value="5" min=0>
+			<button onClick="generate()">Generuj Linki</button>
+			<button onClick="genTable()">Generuj Tabele</button>
+			<button onClick="genGroup()">Generuj Grupy</button>
 		</div>
 		<div id="test">
 		
@@ -26,15 +18,16 @@ Wyślij fejk"></textarea>
 			//https://support.google.com/calendar/thread/56952440/how-do-i-permanently-change-the-default-notification-time?hl=en
 		
 			var d = 0;
-			var array2d = [];
 			var arrayTemp;
 			var test = document.getElementById("test");
 			var testTable = document.getElementById("textToTable");
+			var configMINUTES = 10;
 			
 			function generate() {
 				var text = document.getElementById("textToParse").value;
 				var array = text.split("\n");
 				var table = "<table>";
+				var array2d = [];
 				
 				for(i = 0; i < (array.length / 4); i++) {
 					var id = i * 4;
@@ -71,11 +64,12 @@ Wyślij fejk"></textarea>
 				var text = document.getElementById("textToParse").value;
 				var array = text.split("\n");
 				var table = "[table]\n[**]head1[||]head2[||]head3[/**]\n";
+				var array2d = [];
 				
 				for(i = 0; i < (array.length / 4); i++) {
 					var id = i * 4;
 					array2d.push([array[id], array[id + 1], array[id + 2]]);
-					console.log(array[i]);
+					//console.log(array[i]);
 				}
 				
 				for(i = 0; i < array2d.length; i++) {
@@ -86,8 +80,101 @@ Wyślij fejk"></textarea>
 				testTable.innerHTML = table;
 			}
 			
+			function genGroup() {
+				var text = document.getElementById("textToParse").value;
+				var array = text.split("\n");
+				var tableBB = "";
+				var array2d = [];
+				var array2e = [];
+				configMINUTES = Number(document.getElementById("configMIN").value);
+				
+				for(i = 0; i < (array.length / 4); i++) {
+					var id = i * 4;
+					array2d.push([array[id], array[id + 1], array[id + 2]]);
+					//console.log(array[i]);
+				}
+				
+				for(i = 0; i < array2d.length; i++) {
+					var calendarID = array2d[i][0].slice(0, array2d[i][0].indexOf("."));
+					
+					var calendarATTACK;
+					if(array2d[i][0].includes("OFF")) 				{ calendarATTACK = "OFF"; }
+					else if(array2d[i][0].includes("Burzak"))	 	{ calendarATTACK = "Burzak"; }
+					else if(array2d[i][0].includes("Wyślij fejk")) 	{ calendarATTACK = "Wyślij fejk"; }
+					else 											{ calendarATTACK = "undefined"; }
+					//console.log(calendarATTACK);
+					
+					let date1 = new Date("" + array2d[i][1].slice(3,13) + "T" + array2d[i][1].slice(29,37));
+					let date2 = new Date("" + array2d[i][1].slice(3,13) + "T" + array2d[i][1].slice(40,48));
+					if (date2 < date1) { date2.setDate(date2.getDate() + 1); }
+					//console.log(date1);
+					//console.log(date2);
+					
+					array2e.push([calendarID, calendarATTACK, date1, date2]);
+				}
+				
+				var begin = 0;
+				var end = 0;
+				var group = 1;
+				var timestamp = new Date(array2e[0][3]);
+				timestamp.setMinutes(timestamp.getMinutes() - configMINUTES);
+				
+				for(i = 1; i < array2e.length; i++) {
+					if(array2e[i][2] < timestamp) {
+						if (array2e[i][3] < timestamp){
+							timestamp = new Date(array2e[i][3]);
+							timestamp.setMinutes(timestamp.getMinutes() - configMINUTES);
+						}
+						end = i;
+					}
+					else {
+						//console.log("Grupa " + group + ": " + (begin + 1) + " - " + (end + 1));
+						
+						var beginTime = array2e[end][2].getHours() + ":" + return00(array2e[end][2].getMinutes());
+						var endTime = new Date(timestamp);
+						endTime.setMinutes(endTime.getMinutes() + configMINUTES);
+						endTime = endTime.getHours() + ":" + return00(endTime.getMinutes());
+						groupName = "Grupa " + group + " (" + beginTime + "-" + endTime + ")";
+						
+						tableBB = tableBB + "[size=12][b]" + groupName + "[/b][/size]\n\n[table]\n[**]Atak[||]Czas[||]Link[/**]\n";
+						for(j = begin; j <= end; j++) {
+							tableBB = tableBB + "[*]" + array2d[j][0] + "[|]" + array2d[j][1] + "[|]" + array2d[j][2] + "[/*]\n";
+						}
+						tableBB = tableBB + "[/table]\n\n"
+						
+						group = group + 1;
+						begin = i;
+						end = i;
+						timestamp = new Date(array2e[begin][3]);
+						timestamp.setMinutes(timestamp.getMinutes() - configMINUTES);
+					}
+					//console.log(i + 1)
+				}
+				//console.log("Grupa " + group + ": " + begin + " - " + end);
+				
+				var beginTime = array2e[end][2].getHours() + ":" + return00(array2e[end][2].getMinutes());
+				var endTime = new Date(timestamp);
+				endTime.setMinutes(endTime.getMinutes() + configMINUTES);
+				endTime = endTime.getHours() + ":" + return00(endTime.getMinutes());
+				groupName = "Grupa " + group + " (" + beginTime + "-" + endTime + ")";
+						
+				tableBB = tableBB + "[size=12][b]" + groupName + "[/b][/size]\n\n[table]\n[**]Atak[||]Czas[||]Link[/**]\n";
+				for(j = begin; j <= end; j++) {
+					tableBB = tableBB + "[*]" + array2d[j][0] + "[|]" + array2d[j][1] + "[|]" + array2d[j][2] + "[/*]\n";
+				}
+				tableBB = tableBB + "[/table]\n\n"
+				
+				testTable.innerHTML = tableBB;
+				//test.innerHTML = table;
+			}
+			
 			function color(id) {
 				document.getElementById(id).style.backgroundColor = "red";
+			}
+			
+			function return00(k) {
+				if (k < 10) { return "0" + k; }
+				else 		{ return k; }
 			}
 		</script>
 	</body>
