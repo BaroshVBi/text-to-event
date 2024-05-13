@@ -83,6 +83,7 @@
 			function genGroup() {
 				var text = document.getElementById("textToParse").value;
 				var array = text.split("\n");
+				var table = "<table>";
 				var tableBB = "";
 				var array2d = [];
 				var array2e = [];
@@ -131,16 +132,24 @@
 						//console.log("Grupa " + group + ": " + (begin + 1) + " - " + (end + 1));
 						
 						var beginTime = array2e[end][2].getHours() + ":" + return00(array2e[end][2].getMinutes());
+						var beginTimeDate = "" + array2e[end][2].getFullYear() + return00(array2e[end][2].getMonth() + 1) + return00(array2e[end][2].getDate()) + "T" + return00(array2e[end][2].getHours()) + return00(array2e[end][2].getMinutes()) + return00(array2e[end][2].getSeconds());
 						var endTime = new Date(timestamp);
 						endTime.setMinutes(endTime.getMinutes() + configMINUTES);
 						endTime = endTime.getHours() + ":" + return00(endTime.getMinutes());
 						groupName = "Grupa " + group + " (" + beginTime + "-" + endTime + ")";
+						var endTimeDate = "" + timestamp.getFullYear() + return00(timestamp.getMonth() + 1) + return00(timestamp.getDate()) + "T" + return00(timestamp.getHours()) + return00(timestamp.getMinutes()) + return00(timestamp.getSeconds());
 						
 						tableBB = tableBB + "[size=12][b]" + groupName + "[/b][/size]\n\n[table]\n[**]Atak[||]Czas[||]Link[/**]\n";
 						for(j = begin; j <= end; j++) {
 							tableBB = tableBB + "[*]" + array2d[j][0] + "[|]" + array2d[j][1] + "[|]" + array2d[j][2] + "[/*]\n";
 						}
 						tableBB = tableBB + "[/table]\n\n"
+						
+						groupName = groupName.replace(/ /g, "+");
+						var calendarLINK1 = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + groupName + "&details=plemiona&dates=" + beginTimeDate + "/" + beginTimeDate;
+						var calendarLINK2 = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + groupName + "&details=plemiona&dates=" + endTimeDate + "/" + endTimeDate;
+					
+						table = table + "<tr><td>" + groupName + "</td><td id='Grupa" + group + "a' ><a onClick='color(\"Grupa" + group +"a\")' target='_blank' href = " + calendarLINK1 + ">DODAJ</a></td><td id='Grupa" + group + "b' ><a onClick='color(\"Grupa" + group +"b\")' target='_blank' href = " + calendarLINK2 + ">DODAJ</a></td></tr>"; 
 						
 						group = group + 1;
 						begin = i;
@@ -165,7 +174,7 @@
 				tableBB = tableBB + "[/table]\n\n"
 				
 				testTable.innerHTML = tableBB;
-				//test.innerHTML = table;
+				test.innerHTML = table;
 			}
 			
 			function color(id) {
